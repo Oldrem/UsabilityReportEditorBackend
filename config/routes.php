@@ -21,13 +21,21 @@ Router::group([
     Router::post('/auth/register', 'AuthenticationController@register');
     Router::get('/blocks/reports/{id}', 'ReportBlockController@getAllByReportId')
         ->where(['id' => '[\d]+']);
+    Router::post('/blocks', 'ReportBlockController@create');
+    Router::put('/blocks/{id}', 'ReportBlockController@update')
+        ->where(['id' => '[\d]+']);
     // authenticated routes
     Router::group([
         'middleware' => [
             AuthenticationMiddleware::class
         ]
     ], function () {
-        Router::get('/reports', 'ReportController@getAllReports');
+        Router::get('/auth/user', 'AuthenticationController@getUserInfo');
+        Router::delete('/blocks/{id}', 'ReportBlockController@delete')
+            ->where(['id' => '[\d]+']);
+        Router::delete('/blocks/{id}/children', 'ReportBlockController@deleteWithChildren')
+            ->where(['id' => '[\d]+']);
+
         //Router::get('/reports', 'ReportController@getAllReports');
         /*Router::post('/project/update/{id}', 'ProjectController@update')
             ->where(['id' => '[\d]+']);*/

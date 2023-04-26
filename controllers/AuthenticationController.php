@@ -40,7 +40,7 @@ class AuthenticationController extends Controller
                 // Configures the time that the token was issue (iat claim)
                 ->issuedAt($now)
                 // Configures the expiration time of the token (exp claim)
-                ->expiresAt($now->modify('+10 minutes'))
+                ->expiresAt($now->modify('+10 days'))
                 // Configures a new claim, called "uid"
                 ->withClaim('uid', $user->id)
                 // Configures a new header, called "foo"
@@ -70,5 +70,14 @@ class AuthenticationController extends Controller
         if (!$this->userRepository->create($created_user)){
             throw new NotAuthorizedHttpException('Токен доступа не валиден или просрочен');
         }
+    }
+
+    public function getUserInfo()
+    {
+        $user = $this->userRepository->findById($this->request->uid);
+        $this->response->json([
+            'id' => $user->id,
+            'username' => $user->username
+        ]);
     }
 }

@@ -26,7 +26,7 @@ abstract class Controller
     public function setCors()
     {
         $this->response->header('Access-Control-Allow-Origin: *');
-        $this->response->header('Access-Control-Request-Method: POST, GET, OPTIONS, PUT, DELETE, HEAD');
+        $this->response->header('Access-Control-Allow-Methods: *');
         $this->response->header("Access-Control-Allow-Headers: *");
         $this->response->header('Access-Control-Allow-Credentials: true');
         $this->response->header('Access-Control-Max-Age: 1728000');

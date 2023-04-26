@@ -55,6 +55,22 @@ class UserRepository
         return $user;
     }
 
+    function findById($id)
+    {
+        $query = "SELECT * FROM " . $this->table_name . " WHERE id = ?";
+        $stmt = $this->database->prepare($query);
+        mysqli_stmt_bind_param($stmt, "i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($row = $result->fetch_assoc()){
+            $user = new User();
+            $user->id = $row["id"];
+            $user->username = $row["username"];
+            $user->password = $row["password"];
+        }
+        return $user;
+    }
+
     function create($user): bool
     {
         $query = "INSERT INTO " . $this->table_name . " (username, password) VALUES (?, ?)";

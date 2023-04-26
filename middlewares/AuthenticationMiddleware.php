@@ -22,7 +22,7 @@ class AuthenticationMiddleware implements IMiddleware
     public function handle(Request $request): void
     {
         $headers = getallheaders();
-        $tokenString = substr($headers['Authorization'] ?? '', 7);
+        $tokenString = substr($headers['authorization'] ?? '', 7);
         $config = Configuration::forSymmetricSigner(
             new Sha256(),
             InMemory::plainText('kjcmlethjisdfglmjg')
@@ -35,15 +35,14 @@ class AuthenticationMiddleware implements IMiddleware
                 $token,
                 new SignedWith(
                     new Sha256(),
-                    InMemory::plainText('rkjahnvuirfngnqmnfdjs')
+                    InMemory::plainText('kjcmlethjisdfglmjg')
                 ),
                 new ValidAt(new FrozenClock(new DateTimeImmutable()))
             )
         ) {
             throw new NotAuthorizedHttpException('Токен доступа не валиден или просрочен');
         }
-
         $userId = $token->claims()->get('uid');
-        $request['uid'] = $userId;
+        $request->uid = $userId;
     }
 }
