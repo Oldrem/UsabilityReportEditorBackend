@@ -31,6 +31,15 @@ Router::group([
         ]
     ], function () {
         Router::get('/auth/user', 'AuthenticationController@getUserInfo');
+
+        Router::get('/reports', 'ReportController@getAllUserReports');
+        Router::post('/reports', 'ReportController@createReport');
+        Router::put('/reports/{id}', 'ReportController@updateReport')
+            ->where(['id' => '[\d]+']);
+        Router::delete('/reports/{id}', 'ReportController@deleteReport')
+            ->where(['id' => '[\d]+']);
+
+        Router::post('/reports', 'ReportController@createReport');
         Router::delete('/blocks/{id}', 'ReportBlockController@delete')
             ->where(['id' => '[\d]+']);
         Router::delete('/blocks/{id}/children', 'ReportBlockController@deleteWithChildren')
