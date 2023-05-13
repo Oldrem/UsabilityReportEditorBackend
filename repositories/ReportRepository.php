@@ -46,7 +46,7 @@ class ReportRepository
     {
         $reports = array();
 
-        $query = "SELECT * FROM " . $this->table_name . " WHERE author_id = ?";
+        $query = "SELECT * FROM " . $this->table_name . " WHERE author_id = ? ORDER BY id DESC";
         $stmt = $this->database->prepare($query);
         mysqli_stmt_bind_param($stmt, "i", $author_id);
         $stmt->execute();
@@ -62,6 +62,27 @@ class ReportRepository
             $reports[] = $report;
         }
         return $reports;
+    }
+
+    function findById($reportId): Report
+    {
+
+        $query = "SELECT * FROM " . $this->table_name . " WHERE id = ?";
+        $stmt = $this->database->prepare($query);
+        mysqli_stmt_bind_param($stmt, "i", $reportId);
+        if($stmt->execute()){
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            $report = new Report();
+            $report->id = $row["id"];
+            $report->author_id = $row["author_id"];
+            $report->title = $row["title"];
+            $report->text = $row["text"];
+            return $report;
+        }
+        else{
+            throw new mysqli_sql_exception("Database SQL exception.");
+        }
     }
 
     function create($report)

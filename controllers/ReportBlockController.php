@@ -2,25 +2,31 @@
 
 namespace app\controllers;
 
+use app\exceptions\NotAuthorizedHttpException;
 use app\model\ReportBlock;
 use app\repositories\ReportBlockRepository;
+use app\repositories\ReportRepository;
 
 class ReportBlockController extends Controller
 {
     private ReportBlockRepository $reportBlockRepository;
+    private ReportRepository $reportRepository;
     public function __construct()
     {
         parent::__construct();
         $this->reportBlockRepository = new ReportBlockRepository();
+        $this->reportRepository = new ReportRepository();
     }
 
 
     public function getAllByReportId($reportId)
     {
         $reportBlocks = $this->reportBlockRepository->findAllByReportId($reportId);
+        $report = $this->reportRepository->findById($reportId);
         $this->response->json([
             [
-                'blocks' => $reportBlocks
+                'blocks' => $reportBlocks,
+                'authorId' => $report->author_id
             ]
         ]);
     }
@@ -28,6 +34,9 @@ class ReportBlockController extends Controller
     public function create()
     {
         $reportBlock = $this->getReportBlockFromBody();
+        if (!$this->isOwner($reportBlock->reportId)){
+            throw new NotAuthorizedHttpException("Not authorized to work with this report");
+        }
         $result = $this->reportBlockRepository->create($reportBlock);
         $this->response->json([
             $result
@@ -38,7 +47,10 @@ class ReportBlockController extends Controller
     {
 
         $reportBlock = $this->getReportBlockFromBody();
-        $result = $this->reportBlockRepository->update($reportId, $reportBlock);
+        if (!$this->isOwner($reportBlock->reportId)){
+            throw new NotAuthorizedHttpException("Not authorized to work with this report");
+        }
+        $result = $this->reportBlockRepository->update($reportId, $reportBlock, $this->request->reportBlock['oldParent'], $this->request->reportBlock['oldPosition']);
         $this->response->json([
             $result
         ]);
@@ -70,12 +82,15 @@ class ReportBlockController extends Controller
         }
         $reportBlock->parentId = $this->request->reportBlock['parentId'];
         $reportBlock->reportId = $this->request->reportBlock['reportId'];
-        $reportBlock->importReportId = $this->request->reportBlock['importReportId'];
+        $reportBlock->position = $this->request->reportBlock['position'];
         $reportBlock->title = $this->request->reportBlock['title'];
         $reportBlock->content = $this->request->reportBlock['content'];
-
         return $reportBlock;
     }
 
+    private function isOwner($reportId){
+        $report = $this->reportRepository->findById($reportId);
+        return $report->author_id == $this->request->uid;
+    }
 
 }

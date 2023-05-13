@@ -7,6 +7,7 @@ use app\exceptions\NotAuthorizedHttpException;
 use app\model\User;
 use app\repositories\UserRepository;
 use DateTimeImmutable;
+use Exception;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
@@ -49,6 +50,7 @@ class AuthenticationController extends Controller
                 ->getToken($config->signer(), $config->signingKey());
 
             $this->response->json([
+                'id' => $user->id,
                 'username' => $user->username,
                 'accessToken' => $token->toString()
             ]);
@@ -68,7 +70,7 @@ class AuthenticationController extends Controller
         $created_user->username = $this->request->username;
         $created_user->password =  password_hash($this->request->password, PASSWORD_DEFAULT);
         if (!$this->userRepository->create($created_user)){
-            throw new NotAuthorizedHttpException('Токен доступа не валиден или просрочен');
+            throw new Exception('Не удалось зарегистрировать пользователя');
         }
     }
 

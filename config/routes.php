@@ -19,17 +19,19 @@ Router::group([
 ], function () {
     Router::post('/auth/login', 'AuthenticationController@login');
     Router::post('/auth/register', 'AuthenticationController@register');
+
     Router::get('/blocks/reports/{id}', 'ReportBlockController@getAllByReportId')
         ->where(['id' => '[\d]+']);
-    Router::post('/blocks', 'ReportBlockController@create');
-    Router::put('/blocks/{id}', 'ReportBlockController@update')
-        ->where(['id' => '[\d]+']);
+
+    Router::get('/hypotheses', 'ImportController@getAllHypotheses');
+    Router::get('/tasks', 'ImportController@getAllTasks');
     // authenticated routes
     Router::group([
         'middleware' => [
             AuthenticationMiddleware::class
         ]
     ], function () {
+
         Router::get('/auth/user', 'AuthenticationController@getUserInfo');
 
         Router::get('/reports', 'ReportController@getAllUserReports');
@@ -38,8 +40,11 @@ Router::group([
             ->where(['id' => '[\d]+']);
         Router::delete('/reports/{id}', 'ReportController@deleteReport')
             ->where(['id' => '[\d]+']);
-
         Router::post('/reports', 'ReportController@createReport');
+
+        Router::post('/blocks', 'ReportBlockController@create');
+        Router::put('/blocks/{id}', 'ReportBlockController@update')
+            ->where(['id' => '[\d]+']);
         Router::delete('/blocks/{id}', 'ReportBlockController@delete')
             ->where(['id' => '[\d]+']);
         Router::delete('/blocks/{id}/children', 'ReportBlockController@deleteWithChildren')
@@ -72,7 +77,8 @@ Router::error(function(Request $request, Exception $exception) {
             $response->httpCode(404);
             break;
         }
-        case Exception::class: {
+        case Exception::class:
+        case mysqli_sql_exception::class: {
             $response->httpCode(500);
             break;
         }

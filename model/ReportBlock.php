@@ -8,7 +8,7 @@ class ReportBlock
     public $id;
     public $parentId;
     public $reportId;
-    public $importReportId;
+    public $position;
     public $title;
     public $content;
 

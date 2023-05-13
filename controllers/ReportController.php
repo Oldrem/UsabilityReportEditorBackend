@@ -36,8 +36,8 @@ class ReportController extends Controller
     public function updateReport($reportId)
     {
         $report = new Report();
-        $report->id = $this->request->report['id'];
-        $report->author_id = $this->request->report['author_id'];
+        $report->id = $reportId;
+        $report->author_id = $this->request->uid;
         $report->title = $this->request->report['title'];
         $report->text = $this->request->report['text'];
 

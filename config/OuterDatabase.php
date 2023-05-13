@@ -10,7 +10,7 @@ define('DB_PASSWORD', 'ntktgjhn1');
 define('DB_NAME', 'thesis');
 
 
-class Database {
+class OuterDatabase {
     function getConnection()
     {
         static $link;
